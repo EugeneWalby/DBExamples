@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">DBExamples</string>
+    <string name="sqlite">SQLite</string>
+    <string name="realm">Realm</string>
+    <string name="greendao">GreenDAO</string>
+    <string name="insert">insert</string>
+</resources>
