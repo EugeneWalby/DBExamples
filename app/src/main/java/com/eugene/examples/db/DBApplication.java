@@ -2,6 +2,7 @@ package com.eugene.examples.db;
 
 import android.app.Application;
 
+import com.eugene.examples.db.data.db.RealmManager;
 import com.eugene.examples.db.data.db.SQLiteDBManager;
 import com.facebook.stetho.Stetho;
 
@@ -26,5 +27,9 @@ public class DBApplication extends Application {
 
         RealmConfiguration config = new RealmConfiguration.Builder(getApplicationContext()).build();
         Realm.setDefaultConfiguration(config);
+
+        if (RealmManager.isNull()) {
+            RealmManager.initDatabase(this);
+        }
     }
 }

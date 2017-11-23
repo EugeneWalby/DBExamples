@@ -11,5 +11,13 @@ import java.util.List;
  */
 
 public interface DBPresenter {
-    void insertToSQLite(@NonNull final List<User> users);
+    void insertSQLite(@NonNull final List<User> userList);
+    void readSQLite();
+    void updateSQLite(@NonNull final List<User> userList);
+    void deleteSQLite(@NonNull final List<User> userList);
+
+    void insertRealm(@NonNull final List<User> userList);
+    void readRealm();
+    void updateRealm(@NonNull final List<User> userList);
+    void deleteRealm(@NonNull final List<User> userList);
 }

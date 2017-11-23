@@ -4,4 +4,7 @@
     <string name="realm">Realm</string>
     <string name="greendao">GreenDAO</string>
     <string name="insert">insert</string>
+    <string name="update">update</string>
+    <string name="read">read</string>
+    <string name="delete">delete</string>
 </resources>

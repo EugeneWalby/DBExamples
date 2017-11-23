@@ -93,91 +93,133 @@ public class SQLiteDBManager extends SQLiteOpenHelper {
         }
     }
 
-    public void insertUser(@NonNull final User user) {
-        db.beginTransaction();
-        try {
-            final ContentValues cv = new ContentValues();
-            cv.put(FULL_NAME, user.getFullName());
-            cv.put(AGE, user.getAge());
-            cv.put(CITY, user.getCity());
-            db.insert(TABLE_USER, null, cv);
-            db.setTransactionSuccessful();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    public void insertUsers(@NonNull final List<User> users, @NonNull final DBOperationCallback callback) {
+    public void insertUsers(@NonNull final List<User> userList, @NonNull final DBOperationCallback callback) {
         executor.execute(new Runnable() {
             @Override
             public void run() {
+                callback.onStartDBOperations();
                 final long startTime = System.currentTimeMillis();
-                final long endTime;
                 db.beginTransaction();
                 try {
-                    for (User user : users) {
-                        final ContentValues cv = new ContentValues();
-                        cv.put(FULL_NAME, user.getFullName());
-                        cv.put(AGE, user.getAge());
-                        cv.put(CITY, user.getCity());
-                        db.insert(TABLE_USER, null, cv);
+                    for (User user : userList) {
+                        insertUser(user);
                     }
                     db.setTransactionSuccessful();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
                     db.endTransaction();
-                    endTime = System.currentTimeMillis();
+                    final long endTime = System.currentTimeMillis();
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onOperationFinished(String.valueOf(endTime - startTime));
+                            callback.onSQLiteInsertFinished(String.valueOf(endTime - startTime));
                         }
                     });
                 }
             }
         });
     }
-    public void updateUser(@NonNull final User user, final int id) {
-        db.beginTransaction();
-        try {
-            final ContentValues cv = new ContentValues();
-            cv.put(FULL_NAME, user.getFullName());
-            cv.put(AGE, user.getAge());
-            cv.put(CITY, user.getCity());
-            final String where = ID + " = " + String.valueOf(id);
-            db.update(TABLE_USER, cv, where, null);
-            db.setTransactionSuccessful();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            db.endTransaction();
-        }
+
+    private void insertUser(@NonNull final User user) {
+        final ContentValues cv = new ContentValues();
+        cv.put(FULL_NAME, user.getFullName());
+        cv.put(AGE, user.getAge());
+        cv.put(CITY, user.getCity());
+        db.insert(TABLE_USER, null, cv);
     }
 
-    public List<User> getUsers() {
+    public void updateUsers(@NonNull final List<User> userList, @NonNull final DBOperationCallback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final long startTime = System.currentTimeMillis();
+                db.beginTransaction();
+                try {
+                    for (int i = 0; i < userList.size(); ++i) {
+                        updateUser(userList.get(i), i);
+                    }
+                    db.setTransactionSuccessful();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    db.endTransaction();
+                    final long endTime = System.currentTimeMillis();
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onSQLiteUpdateFinished(String.valueOf(endTime - startTime));
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void updateUser(@NonNull final User user, final int id) {
+        final ContentValues cv = new ContentValues();
+        cv.put(FULL_NAME, user.getFullName());
+        cv.put(AGE, user.getAge());
+        cv.put(CITY, user.getCity());
+        final String where = ID + " = " + String.valueOf(id);
+        db.update(TABLE_USER, cv, where, null);
+    }
+
+    public List<User> getUsers(@NonNull final DBOperationCallback callback) {
         final String select = "SELECT * FROM " + TABLE_USER;
         final Cursor cursor = db.rawQuery(select, null);
-        return getUserModelList(cursor);
+        return getUserModelList(cursor, callback);
     }
 
-    private List<User> getUserModelList(@NonNull final Cursor cursor) {
+    private List<User> getUserModelList(@NonNull final Cursor cursor, @NonNull final DBOperationCallback callback) {
         final List<User> userModelList = new ArrayList<>();
-        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-            final User user = new User();
-            user.setId(cursor.getInt(cursor.getColumnIndex(ID)));
-            user.setFullName(cursor.getString(cursor.getColumnIndexOrThrow(FULL_NAME)));
-            user.setAge(cursor.getInt(cursor.getColumnIndexOrThrow(AGE)));
-            user.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY)));
-            userModelList.add(user);
-        }
-        cursor.close();
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final long startTime = System.currentTimeMillis();
+                for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                    final User user = new User();
+                    user.setId(cursor.getInt(cursor.getColumnIndex(ID)));
+                    user.setFullName(cursor.getString(cursor.getColumnIndexOrThrow(FULL_NAME)));
+                    user.setAge(cursor.getInt(cursor.getColumnIndexOrThrow(AGE)));
+                    user.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY)));
+                    userModelList.add(user);
+                }
+                cursor.close();
+                final long endTime = System.currentTimeMillis();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onSQLiteReadFinished(String.valueOf(endTime - startTime));
+                    }
+                });
+            }
+        });
+
         return userModelList;
     }
 
-    public boolean deleteUser(final int id) {
-        return db.delete(TABLE_USER, ID + "=" + id, null) > 0;
+    public void deleteUsers(@NonNull final List<User> userList, @NonNull final DBOperationCallback callback) {
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final long startTime = System.currentTimeMillis();
+                for (int i = 0; i < userList.size(); i++) {
+                    deleteUser(i + 1);
+                }
+                final long endTime = System.currentTimeMillis();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onSQLiteDeleteFinished(String.valueOf(endTime - startTime));
+                        callback.onFinishDBOperations();
+                    }
+                });
+            }
+        });
+    }
+
+    private void deleteUser(final int id) {
+        db.delete(TABLE_USER, ID + "=" + id, null);
     }
 }

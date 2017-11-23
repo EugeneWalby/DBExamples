@@ -3,5 +3,15 @@ package com.eugene.examples.db.ui.callback;
 import android.support.annotation.NonNull;
 
 public interface DBOperationCallback {
-    void onOperationFinished(@NonNull final String timeElapsed);
+    void onStartDBOperations();
+    void onFinishDBOperations();
+    void onSQLiteInsertFinished(@NonNull final String timeElapsed);
+    void onSQLiteReadFinished(@NonNull final String timeElapsed);
+    void onSQLiteUpdateFinished(@NonNull final String timeElapsed);
+    void onSQLiteDeleteFinished(@NonNull final String timeElapsed);
+
+    void onRealmInsertFinished(@NonNull final String timeElapsed);
+    void onRealmReadFinished(@NonNull final String timeElapsed);
+    void onRealmUpdateFinished(@NonNull final String timeElapsed);
+    void onRealmDeleteFinished(@NonNull final String timeElapsed);
 }
