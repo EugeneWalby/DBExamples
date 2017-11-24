@@ -2,8 +2,9 @@ package com.eugene.examples.db.ui.activity;
 
 import android.support.annotation.NonNull;
 
-import com.eugene.examples.db.data.db.RealmManager;
+import com.eugene.examples.db.data.db.RealmDBManager;
 import com.eugene.examples.db.data.db.SQLiteDBManager;
+import com.eugene.examples.db.data.model.RealmUser;
 import com.eugene.examples.db.data.model.User;
 import com.eugene.examples.db.ui.callback.DBOperationCallback;
 
@@ -44,23 +45,26 @@ public class DBPresenterImpl implements DBPresenter, DBOperationCallback {
     }
 
     @Override
-    public void insertRealm(@NonNull List<User> userList) {
-        RealmManager.getInstance().insertUsers(userList, this);
+    public void insertRealm(@NonNull final List<RealmUser> realmUserList) {
+        RealmDBManager.getInstance().insertUsers(realmUserList, this);
     }
 
     @Override
     public void readRealm() {
-
+        RealmDBManager.getInstance().getUsers(this);
     }
 
     @Override
-    public void updateRealm(@NonNull List<User> userList) {
-
+    public void updateRealm(@NonNull final List<RealmUser> realmUserList) {
+        for (int i = 0; i < realmUserList.size(); i++) {
+            realmUserList.get(i).setFullName("Test" + i);
+        }
+        RealmDBManager.getInstance().updateUsers(realmUserList, this);
     }
 
     @Override
-    public void deleteRealm(@NonNull List<User> userList) {
-
+    public void deleteRealm(@NonNull final List<RealmUser> realmUserList) {
+        RealmDBManager.getInstance().deleteUsers(realmUserList, this);
     }
 
     @Override
@@ -94,22 +98,22 @@ public class DBPresenterImpl implements DBPresenter, DBOperationCallback {
     }
 
     @Override
-    public void onRealmInsertFinished(@NonNull String timeElapsed) {
+    public void onRealmInsertFinished(@NonNull final String timeElapsed) {
         view.onRealmInsertCompleted(timeElapsed);
     }
 
     @Override
-    public void onRealmReadFinished(@NonNull String timeElapsed) {
-
+    public void onRealmReadFinished(@NonNull final List<RealmUser> realmUserList, @NonNull final String timeElapsed) {
+        view.onRealmReadCompleted(timeElapsed);
     }
 
     @Override
-    public void onRealmUpdateFinished(@NonNull String timeElapsed) {
-
+    public void onRealmUpdateFinished(@NonNull final String timeElapsed) {
+        view.onRealmUpdateCompleted(timeElapsed);
     }
 
     @Override
-    public void onRealmDeleteFinished(@NonNull String timeElapsed) {
-
+    public void onRealmDeleteFinished(@NonNull final String timeElapsed) {
+        view.onRealmDeleteCompleted(timeElapsed);
     }
 }

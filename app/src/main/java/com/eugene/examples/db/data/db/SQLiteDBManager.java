@@ -23,7 +23,7 @@ import static android.R.attr.name;
  * Created by eugene on 11/20/2017.
  */
 
-public class SQLiteDBManager extends SQLiteOpenHelper {
+public class SQLiteDBManager extends SQLiteOpenHelper implements DBManager {
     private static final String DB_NAME = "SQLiteDB";
     private static final int VERSION = 1;
     private static final String TABLE_USER = "user_table";
@@ -93,6 +93,7 @@ public class SQLiteDBManager extends SQLiteOpenHelper {
         }
     }
 
+    @Override
     public void insertUsers(@NonNull final List<User> userList, @NonNull final DBOperationCallback callback) {
         executor.execute(new Runnable() {
             @Override

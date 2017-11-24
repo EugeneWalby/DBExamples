@@ -2,6 +2,7 @@ package com.eugene.examples.db.ui.activity;
 
 import android.support.annotation.NonNull;
 
+import com.eugene.examples.db.data.model.RealmUser;
 import com.eugene.examples.db.data.model.User;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public interface DBPresenter {
     void updateSQLite(@NonNull final List<User> userList);
     void deleteSQLite(@NonNull final List<User> userList);
 
-    void insertRealm(@NonNull final List<User> userList);
+    void insertRealm(@NonNull final List<RealmUser> realmUserList);
     void readRealm();
-    void updateRealm(@NonNull final List<User> userList);
-    void deleteRealm(@NonNull final List<User> userList);
+    void updateRealm(@NonNull final List<RealmUser> realmUserList);
+    void deleteRealm(@NonNull final List<RealmUser> realmUserList);
 }

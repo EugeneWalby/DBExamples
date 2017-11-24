@@ -1,5 +1,7 @@
 package com.eugene.examples.db.data.model;
 
+import java.util.UUID;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -9,16 +11,27 @@ import io.realm.annotations.PrimaryKey;
 
 public class RealmUser extends RealmObject {
     @PrimaryKey
-    private int id;
+    private String id;
     private String fullName;
     private int age;
     private String city;
 
-    public int getId() {
+    public RealmUser() {
+
+    }
+
+    public RealmUser(String fullName, int age, String city) {
+        this.id = UUID.randomUUID().toString();
+        this.fullName = fullName;
+        this.age = age;
+        this.city = city;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

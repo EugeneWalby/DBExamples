@@ -8,14 +8,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.eugene.examples.db.R;
+import com.eugene.examples.db.data.model.RealmUser;
 import com.eugene.examples.db.data.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements DBView {
-    private static final int USERS_COUNT = 10000;
+    private static final int USERS_COUNT = 1000;
     private List<User> userList;
+    private List<RealmUser> realmUserList;
     private DBPresenter presenter;
 
     private ProgressBar progressBar;
@@ -40,7 +42,11 @@ public class MainActivity extends AppCompatActivity implements DBView {
 //        presenter.updateSQLite(userList);
 //        presenter.deleteSQLite(userList);
 
-        presenter.insertRealm(userList);
+        createRealmUserList();
+        presenter.insertRealm(realmUserList);
+        presenter.readRealm();
+        presenter.updateRealm(realmUserList);
+        presenter.deleteRealm(realmUserList);
     }
 
     private void init() {
@@ -88,22 +94,22 @@ public class MainActivity extends AppCompatActivity implements DBView {
     }
 
     @Override
-    public void onRealmInsertCompleted(@NonNull String timeElapsed) {
+    public void onRealmInsertCompleted(@NonNull final String timeElapsed) {
         tvRealmInsert.setText(timeElapsed);
     }
 
     @Override
-    public void onRealmReadCompleted(@NonNull String timeElapsed) {
+    public void onRealmReadCompleted(@NonNull final String timeElapsed) {
         tvRealmRead.setText(timeElapsed);
     }
 
     @Override
-    public void onRealmUpdateCompleted(@NonNull String timeElapsed) {
+    public void onRealmUpdateCompleted(@NonNull final String timeElapsed) {
         tvRealmUpdate.setText(timeElapsed);
     }
 
     @Override
-    public void onRealmDeleteCompleted(@NonNull String timeElapsed) {
+    public void onRealmDeleteCompleted(@NonNull final String timeElapsed) {
         tvRealmDelete.setText(timeElapsed);
     }
 
@@ -111,6 +117,13 @@ public class MainActivity extends AppCompatActivity implements DBView {
         userList = new ArrayList<>(USERS_COUNT);
         for (int i = 0; i < USERS_COUNT; i++) {
             userList.add(new User("User" + i, 20 + i % 20, "City" + i));
+        }
+    }
+
+    private void createRealmUserList() {
+        realmUserList = new ArrayList<>(USERS_COUNT);
+        for (int i = 0; i < USERS_COUNT; i++) {
+            realmUserList.add(new RealmUser("User" + i, 20 + i % 20, "City" + i));
         }
     }
 }
